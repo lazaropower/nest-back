@@ -10,8 +10,4 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   fullName: string;
-
-  @IsNotEmpty()
-  @IsDateString()
-  birthdate: string;
 }
