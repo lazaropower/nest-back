@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as argon from 'argon2';
+import { CreateUserResponseType } from './types/create-user-response.type';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UsersService {
@@ -27,13 +31,32 @@ export class UsersService {
     });
   }
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    return this.prisma.user.create({
-      data,
-    });
+  async create(dto: CreateUserDto): Promise<CreateUserResponseType> {
+    const hashedPassword = await argon.hash(dto.password);
+
+    const data: Prisma.UserCreateInput = {
+      email: dto.email,
+      name: dto.name,
+      surname: dto.surname,
+      hash: hashedPassword
+    };
+
+    try {
+      const user = await this.prisma.user.create({ data });
+      const { hash, updatedAt, ...result } = user;
+  
+      return result;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ForbiddenException('User already exists');
+        }
+      }
+      throw error;
+    }
   }
 
-  async updateUser(params: {
+  async update(params: {
     where: Prisma.UserWhereUniqueInput;
     data: Prisma.UserUpdateInput;
   }): Promise<User> {
@@ -44,7 +67,8 @@ export class UsersService {
     });
   }
 
-  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+  async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
+
     return this.prisma.user.delete({
       where,
     });

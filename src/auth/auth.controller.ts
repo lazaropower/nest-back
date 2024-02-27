@@ -4,27 +4,20 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LoginDto } from './dto/login.dto';
+import { LoginResponseType } from './types/login-response.type';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Request() req: any) {
-    return this.authService.login(req?.user);
-  }
-
-  @HttpCode(HttpStatus.CREATED)
-  @Post('register')
-  signUp(@Body() signUpDto: CreateUserDto) {
-    return this.authService.register(signUpDto);
+  signIn(@Body() loginDto: LoginDto): Promise<LoginResponseType> {
+    return this.authService.login(loginDto);
   }
 }
