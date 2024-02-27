@@ -9,7 +9,7 @@ import { LoginResponseType } from './types/login-response.type';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async login(dto: LoginDto): Promise<LoginResponseType> {

@@ -10,10 +10,12 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-    constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) {}
 
-    @Post() 
-    create(@Body() createUserDto: CreateUserDto): Promise<CreateUserResponseType> {
-        return this.usersService.create(createUserDto);
-    }
+  @Post()
+  create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<CreateUserResponseType> {
+    return this.usersService.create(createUserDto);
+  }
 }

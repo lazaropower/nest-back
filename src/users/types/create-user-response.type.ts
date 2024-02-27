@@ -1,6 +1,6 @@
 export type CreateUserResponseType = Readonly<{
-    id: string,
-    fullName: string,
-    email: string,
-    createdAt: Date,
+  id: string;
+  name: string;
+  surname: string;
+  email: string;
 }>;

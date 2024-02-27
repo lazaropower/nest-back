@@ -8,9 +8,11 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async user(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null> {
+  async user(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User | null> {
     return this.prisma.user.findUnique({ where: userWhereUniqueInput });
   }
 
@@ -38,14 +40,20 @@ export class UsersService {
       email: dto.email,
       name: dto.name,
       surname: dto.surname,
-      hash: hashedPassword
+      hash: hashedPassword,
     };
 
     try {
       const user = await this.prisma.user.create({ data });
-      const { hash, updatedAt, ...result } = user;
-  
-      return result;
+
+      const response: CreateUserResponseType = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        surname: user.surname,
+      };
+
+      return response;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -68,7 +76,6 @@ export class UsersService {
   }
 
   async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
-
     return this.prisma.user.delete({
       where,
     });

@@ -1,3 +1,3 @@
 export type LoginResponseType = Readonly<{
-    access_token: string;
+  access_token: string;
 }>;
